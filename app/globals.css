@@ -30,9 +30,7 @@
 @layer base {
   * { @apply border-border; }
   body {
-    @apply bg-background text-text-primary;
-    background-color: #0A0A0F;
-    color: #E8E8FF;
+    @apply bg-background text-foreground;
   }
 }
 
