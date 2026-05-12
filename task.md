@@ -59,7 +59,8 @@ Web version của app Solo Leveling — gamify personal development với RPG me
 - [x] `vercel.ts` config (security headers, cache, region sin1)
 - [x] CI/CD pipeline (auto deploy production + preview per PR)
 - [x] GitHub Secrets configured (VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID)
-- [ ] Smoke test production URL
+- [ ] Add Firebase env vars vào Vercel Dashboard (Settings → Environment Variables)
+- [ ] Smoke test — verify production URL load được
 
 ---
 
@@ -85,3 +86,18 @@ Web version của app Solo Leveling — gamify personal development với RPG me
 - Cloud Functions: dùng chung với mobile (AI proxy, credit ledger)
 - Payments: Stripe trên web (thay vì IAP của mobile)
 - Priority: hoàn thành Phase 1 trước khi bắt đầu Phase 2
+
+---
+
+## 🔖 Dừng lại tại đây — 2026-05-13
+
+### Đã xong hôm nay
+- [x] W1 hoàn thành toàn bộ infrastructure
+- [x] Vercel deployment setup (vercel.ts + CI jobs + GitHub Secrets)
+- [x] task.md tạo mới để tracking
+
+### Làm tiếp ngày mai
+1. **[W8 còn lại]** Thêm Firebase env vars vào Vercel Dashboard → smoke test URL production
+2. **[W2]** Auth screens: Login + Signup pages
+3. **[W2]** Kết nối Firebase Auth → Zustand authStore
+4. **[W3]** App layout: Sidebar (desktop) + Bottom nav (mobile)
