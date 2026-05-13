@@ -1,22 +1,33 @@
-import { initializeApp, getApps, getApp } from 'firebase/app'
+import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app'
 
-const requiredEnvVars = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-} as const
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY ?? '',
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ?? '',
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ?? '',
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ?? '',
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ?? '',
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID ?? '',
+}
 
+// Warn about missing env vars in browser console (client-only)
 if (typeof window !== 'undefined') {
-  const missing = Object.entries(requiredEnvVars)
+  const missing = Object.entries(firebaseConfig)
     .filter(([, v]) => !v)
     .map(([k]) => `NEXT_PUBLIC_FIREBASE_${k.replace(/([A-Z])/g, '_$1').toUpperCase()}`)
   if (missing.length > 0) {
-    throw new Error(`Missing Firebase env vars: ${missing.join(', ')}`)
+    console.error(`[Firebase] Missing env vars: ${missing.join(', ')}`)
   }
 }
 
-const app = getApps().length ? getApp() : initializeApp(requiredEnvVars)
+// Skip initialization on server-side (build/SSR) when env vars are absent
+// Firebase Web SDK is client-only — AuthProvider handles init via onAuthStateChanged
+let app: FirebaseApp
+if (typeof window !== 'undefined' || getApps().length > 0) {
+  app = getApps().length ? getApp() : initializeApp(firebaseConfig)
+} else {
+  // Server-side without existing app: create with empty config (won't be used)
+  // force-dynamic on layout ensures pages are never prerendered with this stub
+  app = initializeApp(firebaseConfig, 'ssr-stub')
+}
+
 export default app
