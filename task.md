@@ -1,0 +1,115 @@
+# Solo Leveling — Arise Web
+
+## Tổng quan
+Web version của app Solo Leveling — gamify personal development với RPG mechanics. Build bằng Next.js 14, Firebase, Tailwind CSS. Deploy trên Vercel.
+
+---
+
+## Web Phase 1 — Validate Core Loop
+
+### W1 — Project Init & Infrastructure
+- [x] Next.js 14 project setup (App Router, TypeScript, Tailwind, shadcn/ui)
+- [x] Firebase config (`lib/firebase/config.ts`, `auth.ts`, `firestore.ts`)
+- [x] TypeScript types (`types/index.ts` — mirror Dart models)
+- [x] Dark RPG theme (Tailwind config + `globals.css` + CSS variables)
+- [x] XP/stat gain logic (`lib/rpg/xp.ts`, `lib/rpg/stats.ts`)
+- [x] Zustand auth store (`lib/store/authStore.ts`)
+- [x] CI workflow (GitHub Actions — lint + typecheck + build)
+- [x] Setup Vercel deployment + environment variables (`vercel.ts`, deploy/preview jobs in CI)
+
+### W2 — Auth ✅
+- [x] Login page (`app/(auth)/login/page.tsx`) — Email/Password + Google, error messages tiếng Việt
+- [x] Signup page (`app/(auth)/signup/page.tsx`) — validate client-side, password complexity
+- [x] Auth guard layout (`app/(app)/layout.tsx`) — redirect `/login` nếu chưa login
+- [x] Connect Zustand authStore với Firebase Auth listeners (atomic state, no flicker)
+- [x] Landing page `/` với ARISE hero + redirect logic
+- [x] Password visibility toggle (eye icon, accessible)
+- [x] Security headers `next.config.mjs` (CSP prod-only)
+- [x] Test files: authStore, firebase-auth, AuthProvider, login, signup
+
+### W3 — App Shell & Layout
+- [ ] Root layout với providers (QueryClient, AuthProvider)
+- [ ] Sidebar navigation (desktop)
+- [ ] Bottom navigation bar (mobile)
+- [ ] Top bar (mobile hamburger + user avatar)
+
+### W4 — Player Profile & Dashboard
+- [ ] Dashboard page (`app/(app)/home/page.tsx`)
+- [ ] `StatBar` component — glowing RPG stat progress bar
+- [ ] `LevelBadge` component — hexagonal level badge
+- [ ] `XPProgress` component — XP bar với animated fill
+- [ ] `ClassBadge` component — player class icon + label
+- [ ] Player profile screen (15 stats, level, class, title)
+
+### W5 — Habit Tracking
+- [ ] Habit list page (`app/(app)/habits/page.tsx`)
+- [ ] Habit creation form
+- [ ] Daily check-off với streak counter
+- [ ] Firestore CRUD cho habits (`lib/queries/useHabits.ts`)
+
+### W6 — Quest System
+- [ ] Quest list page (`app/(app)/quests/page.tsx`) — tabs: Daily/Weekly/Main/Side/Boss
+- [ ] Quest creation form (manual)
+- [ ] Quest completion → XP gain → stat update
+- [ ] `QuestCard` component — quest list item
+- [ ] Firestore CRUD cho quests (`lib/queries/useQuests.ts`)
+
+### W7 — Level-Up Experience
+- [ ] `LevelUpOverlay` component — full-screen animation (Framer Motion)
+- [ ] `useLevelUp` hook — detect + trigger overlay
+- [ ] XP gain animation trên quest completion
+
+### W8 — Vercel Deploy
+- [x] `vercel.ts` config (security headers, cache, region sin1)
+- [x] CI/CD pipeline (auto deploy production + preview per PR)
+- [x] GitHub Secrets configured (VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID)
+- [ ] Add Firebase env vars vào Vercel Dashboard (Settings → Environment Variables)
+- [ ] Smoke test — verify production URL load được
+
+---
+
+## Web Phase 2 — AI + Credits
+- [ ] Goal Planner + AI quest generation (Cloud Functions)
+- [ ] Daily quest display (từ scheduled Cloud Function)
+- [ ] Stripe integration (credit packages)
+- [ ] Credit balance + spend tracking
+
+---
+
+## Web Phase 3 — Full Feature Parity
+- [ ] Boss challenges
+- [ ] Journal screen
+- [ ] Mood tracker screen
+- [ ] Stats & analytics (Recharts)
+- [ ] Notifications (Web Push via FCM)
+
+---
+
+## Ghi chú
+- Firebase project: dùng chung schema với mobile app
+- Cloud Functions: dùng chung với mobile (AI proxy, credit ledger)
+- Payments: Stripe trên web (thay vì IAP của mobile)
+- Priority: hoàn thành Phase 1 trước khi bắt đầu Phase 2
+
+---
+
+## 🔖 Dừng lại tại đây — 2026-05-14
+
+### Đã xong hôm nay
+- [x] W2 hoàn thành toàn bộ Authentication
+- [x] Landing page ARISE, Login page, Signup page — UI Dark RPG hoàn chỉnh
+- [x] Firebase Auth (Email/Password + Google) hoạt động thực tế — đã test signup/login
+- [x] Password eye toggle, error messages tiếng Việt, security headers
+- [x] Code review: fix 2 bugs (mountedRef init, aria-invalid)
+- [x] Test files viết sẵn (cần `npm install` packages để chạy)
+
+### Làm tiếp ngày mai
+1. **[W3]** App Shell — tạo trang `/home` (hết 404 sau login)
+2. **[W3]** Sidebar navigation (desktop) + Bottom nav bar (mobile)
+3. **[W3]** Top bar (avatar + mobile hamburger)
+4. **[W8 còn lại]** Thêm Firebase env vars vào Vercel Dashboard → smoke test production URL
+
+### Ghi chú kỹ thuật
+- CSP headers chỉ apply trong production (dev tắt để tránh conflict với webpack eval-source-map + Chrome Trusted Types)
+- Test packages chưa install: `npm install -D jest jest-environment-jsdom @testing-library/react @testing-library/jest-dom @testing-library/user-event ts-jest @types/jest`
+- Suggestion chưa làm: extract `getAuthErrorMessage` ra `lib/firebase/authErrors.ts`

@@ -30,13 +30,67 @@
 @layer base {
   * { @apply border-border; }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-body;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
   }
+
+  /* Scrollbar — dark RPG style */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #0a0a14; }
+  ::-webkit-scrollbar-thumb {
+    background: #1a1a28;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(0, 212, 255, 0.3); }
 }
 
 @layer utilities {
-  .glow-blue { box-shadow: 0 0 16px rgba(0, 212, 255, 0.4), 0 0 2px rgba(0, 212, 255, 0.6); }
-  .glow-purple { box-shadow: 0 0 16px rgba(139, 92, 246, 0.4), 0 0 2px rgba(139, 92, 246, 0.6); }
-  .glow-gold { box-shadow: 0 0 16px rgba(255, 215, 0, 0.4), 0 0 2px rgba(255, 215, 0, 0.6); }
-  .glow-green { box-shadow: 0 0 16px rgba(0, 255, 136, 0.4), 0 0 2px rgba(0, 255, 136, 0.6); }
+  /* Box-glow: for cards, buttons, borders */
+  .glow-blue   { box-shadow: 0 0 20px rgba(0, 212, 255, 0.35), 0 0 4px rgba(0, 212, 255, 0.6); }
+  .glow-purple { box-shadow: 0 0 20px rgba(139, 92, 246, 0.35), 0 0 4px rgba(139, 92, 246, 0.6); }
+  .glow-gold   { box-shadow: 0 0 20px rgba(255, 215, 0, 0.35), 0 0 4px rgba(255, 215, 0, 0.6); }
+  .glow-green  { box-shadow: 0 0 20px rgba(0, 255, 136, 0.35), 0 0 4px rgba(0, 255, 136, 0.6); }
+
+  /* Text-glow: for headings and neon text */
+  .text-glow-blue   { text-shadow: 0 0 20px rgba(0, 212, 255, 0.8), 0 0 40px rgba(0, 212, 255, 0.4); }
+  .text-glow-purple { text-shadow: 0 0 20px rgba(139, 92, 246, 0.8), 0 0 40px rgba(139, 92, 246, 0.4); }
+  .text-glow-gold   { text-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 215, 0, 0.4); }
+  .text-glow-green  { text-shadow: 0 0 20px rgba(0, 255, 136, 0.8), 0 0 40px rgba(0, 255, 136, 0.4); }
+
+  /* Animated glow on hover for interactive glow elements */
+  .glow-blue-hover:hover   { box-shadow: 0 0 28px rgba(0, 212, 255, 0.55), 0 0 6px rgba(0, 212, 255, 0.8); }
+  .glow-purple-hover:hover { box-shadow: 0 0 28px rgba(139, 92, 246, 0.55), 0 0 6px rgba(139, 92, 246, 0.8); }
+
+  /* Input focus glow ring — cyan */
+  .input-glow:focus {
+    border-color: #00D4FF;
+    box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2), 0 0 12px rgba(0, 212, 255, 0.15);
+    outline: none;
+  }
+
+  /* Card with subtle neon border */
+  .card-rpg {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    box-shadow:
+      0 4px 24px rgba(0, 0, 0, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  /* Scanline overlay for RPG atmosphere */
+  .scanlines::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
+    );
+    pointer-events: none;
+    border-radius: inherit;
+  }
 }
