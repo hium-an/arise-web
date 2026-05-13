@@ -17,11 +17,15 @@ Web version của app Solo Leveling — gamify personal development với RPG me
 - [x] CI workflow (GitHub Actions — lint + typecheck + build)
 - [x] Setup Vercel deployment + environment variables (`vercel.ts`, deploy/preview jobs in CI)
 
-### W2 — Auth
-- [ ] Login page (`app/(auth)/login/page.tsx`)
-- [ ] Signup page (`app/(auth)/signup/page.tsx`)
-- [ ] Auth guard layout (`app/(app)/layout.tsx`)
-- [ ] Connect Zustand authStore với Firebase Auth listeners
+### W2 — Auth ✅
+- [x] Login page (`app/(auth)/login/page.tsx`) — Email/Password + Google, error messages tiếng Việt
+- [x] Signup page (`app/(auth)/signup/page.tsx`) — validate client-side, password complexity
+- [x] Auth guard layout (`app/(app)/layout.tsx`) — redirect `/login` nếu chưa login
+- [x] Connect Zustand authStore với Firebase Auth listeners (atomic state, no flicker)
+- [x] Landing page `/` với ARISE hero + redirect logic
+- [x] Password visibility toggle (eye icon, accessible)
+- [x] Security headers `next.config.mjs` (CSP prod-only)
+- [x] Test files: authStore, firebase-auth, AuthProvider, login, signup
 
 ### W3 — App Shell & Layout
 - [ ] Root layout với providers (QueryClient, AuthProvider)
@@ -89,15 +93,23 @@ Web version của app Solo Leveling — gamify personal development với RPG me
 
 ---
 
-## 🔖 Dừng lại tại đây — 2026-05-13
+## 🔖 Dừng lại tại đây — 2026-05-14
 
 ### Đã xong hôm nay
-- [x] W1 hoàn thành toàn bộ infrastructure
-- [x] Vercel deployment setup (vercel.ts + CI jobs + GitHub Secrets)
-- [x] task.md tạo mới để tracking
+- [x] W2 hoàn thành toàn bộ Authentication
+- [x] Landing page ARISE, Login page, Signup page — UI Dark RPG hoàn chỉnh
+- [x] Firebase Auth (Email/Password + Google) hoạt động thực tế — đã test signup/login
+- [x] Password eye toggle, error messages tiếng Việt, security headers
+- [x] Code review: fix 2 bugs (mountedRef init, aria-invalid)
+- [x] Test files viết sẵn (cần `npm install` packages để chạy)
 
 ### Làm tiếp ngày mai
-1. **[W8 còn lại]** Thêm Firebase env vars vào Vercel Dashboard → smoke test URL production
-2. **[W2]** Auth screens: Login + Signup pages
-3. **[W2]** Kết nối Firebase Auth → Zustand authStore
-4. **[W3]** App layout: Sidebar (desktop) + Bottom nav (mobile)
+1. **[W3]** App Shell — tạo trang `/home` (hết 404 sau login)
+2. **[W3]** Sidebar navigation (desktop) + Bottom nav bar (mobile)
+3. **[W3]** Top bar (avatar + mobile hamburger)
+4. **[W8 còn lại]** Thêm Firebase env vars vào Vercel Dashboard → smoke test production URL
+
+### Ghi chú kỹ thuật
+- CSP headers chỉ apply trong production (dev tắt để tránh conflict với webpack eval-source-map + Chrome Trusted Types)
+- Test packages chưa install: `npm install -D jest jest-environment-jsdom @testing-library/react @testing-library/jest-dom @testing-library/user-event ts-jest @types/jest`
+- Suggestion chưa làm: extract `getAuthErrorMessage` ra `lib/firebase/authErrors.ts`
