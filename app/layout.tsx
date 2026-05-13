@@ -6,6 +6,10 @@ import AuthProvider from '@/components/providers/AuthProvider'
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const orbitron = Orbitron({ subsets: ['latin'], variable: '--font-orbitron' })
 
+// Toàn bộ app là user-specific — không prerender tĩnh
+// Ngăn Firebase bị init trên server lúc build (thiếu env vars)
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Arise — Solo Leveling Personal',
   description: 'Gamified personal development. Rise, Hunter.',
