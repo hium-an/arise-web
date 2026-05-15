@@ -9,7 +9,10 @@ import {
 } from 'firebase/auth'
 import app from './config'
 
-export const auth = getAuth(app)
+// Firebase Auth is client-only — do not initialize on the server.
+// All callers (AuthProvider, login, signup) are 'use client' components.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const auth = typeof window !== 'undefined' ? getAuth(app) : (null as any)
 export const googleProvider = new GoogleAuthProvider()
 
 export async function signInWithEmail(

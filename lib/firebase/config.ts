@@ -19,15 +19,14 @@ if (typeof window !== 'undefined') {
   }
 }
 
-// Skip initialization on server-side (build/SSR) when env vars are absent
-// Firebase Web SDK is client-only — AuthProvider handles init via onAuthStateChanged
-let app: FirebaseApp
-if (typeof window !== 'undefined' || getApps().length > 0) {
-  app = getApps().length ? getApp() : initializeApp(firebaseConfig)
-} else {
-  // Server-side without existing app: create with empty config (won't be used)
-  // force-dynamic on layout ensures pages are never prerendered with this stub
-  app = initializeApp(firebaseConfig, 'ssr-stub')
-}
+// Firebase Web SDK is client-only.
+// On the server, return an empty placeholder — auth.ts also guards usage so
+// no Firebase network call is ever made during SSR.
+const app: FirebaseApp =
+  typeof window !== 'undefined'
+    ? getApps().length
+      ? getApp()
+      : initializeApp(firebaseConfig)
+    : ({} as FirebaseApp)
 
 export default app
