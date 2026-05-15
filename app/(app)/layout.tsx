@@ -1,19 +1,32 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
 import { useAuthStore } from '@/lib/store/authStore'
+import { cn } from '@/lib/utils'
+import NavSidebar from '@/components/nav/NavSidebar'
+import NavBottom from '@/components/nav/NavBottom'
+import NavTopBar from '@/components/nav/NavTopBar'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuthStore()
   const router = useRouter()
+  const pathname = usePathname()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
+  // Auth guard — redirect to login if not authenticated
   useEffect(() => {
     if (!loading && !user) {
       router.replace('/login')
     }
   }, [user, loading, router])
 
+  // Close sidebar overlay on route change
+  useEffect(() => {
+    setSidebarOpen(false)
+  }, [pathname])
+
+  // ── Loading state ────────────────────────────────────────────────────────────
   if (loading) {
     return (
       <div
@@ -21,7 +34,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         role="status"
         aria-label="Đang tải"
       >
-        {/* Spinner with cyan glow */}
         <div className="relative">
           <div className="w-10 h-10 border-2 border-neon-blue/20 rounded-full" aria-hidden="true" />
           <div
@@ -40,5 +52,52 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   // Not logged in — render nothing while redirect is in-flight
   if (!user) return null
 
-  return <>{children}</>
+  // ── App Shell ────────────────────────────────────────────────────────────────
+  return (
+    <div className="min-h-screen bg-background">
+
+      {/* Desktop sidebar — always visible on lg+ */}
+      <NavSidebar className="hidden lg:flex" />
+
+      {/* Mobile / Tablet topbar — hidden on lg+ */}
+      <NavTopBar
+        onMenuClick={() => setSidebarOpen(true)}
+        className="flex lg:hidden"
+      />
+
+      {/* Tablet / Mobile: sidebar overlay backdrop */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Tablet / Mobile: collapsible sidebar — slides in from left */}
+      <NavSidebar
+        className={cn(
+          'flex lg:hidden z-50',
+          'transition-transform duration-300 ease-in-out',
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        )}
+      />
+
+      {/* Main content area */}
+      <main
+        className={cn(
+          'min-h-screen',
+          'lg:ml-[240px]',      // offset for desktop sidebar
+          'pt-[56px] lg:pt-0',  // offset for mobile/tablet topbar
+          'pb-[60px] lg:pb-0'   // offset for mobile/tablet bottom nav
+        )}
+      >
+        {children}
+      </main>
+
+      {/* Mobile / Tablet bottom nav — hidden on lg+ */}
+      <NavBottom className="flex lg:hidden" />
+
+    </div>
+  )
 }
