@@ -27,37 +27,39 @@ Web version của app Solo Leveling — gamify personal development với RPG me
 - [x] Security headers `next.config.mjs` (CSP prod-only)
 - [x] Test files: authStore, firebase-auth, AuthProvider, login, signup
 
-### W3 — App Shell & Layout ✅
+### W3 (GitHub #19) — App Shell & Layout ✅
 - [x] Root layout với providers (QueryClient, AuthProvider)
-- [x] Sidebar navigation (desktop)
-- [x] Bottom navigation bar (mobile)
-- [x] Top bar (mobile hamburger + user avatar)
+- [x] Sidebar navigation (desktop) — NavSidebar
+- [x] Bottom navigation bar (mobile) — NavBottom
+- [x] Top bar (mobile hamburger + user avatar) — NavTopBar
+- [x] Active state highlight với glow effect
 
-### W4 — Player Profile & Dashboard
-- [ ] Dashboard page (`app/(app)/home/page.tsx`)
-- [ ] `StatBar` component — glowing RPG stat progress bar
-- [ ] `LevelBadge` component — hexagonal level badge
-- [ ] `XPProgress` component — XP bar với animated fill
-- [ ] `ClassBadge` component — player class icon + label
-- [ ] Player profile screen (15 stats, level, class, title)
+### W3 (GitHub #12–17) — RPG Components & Player Profile
+> ⚠️ Đây là W3 thật theo GitHub board — cần làm trước W4 Dashboard
+- [ ] `StatBar` component (#12) — glowing RPG stat progress bar (`components/rpg/StatBar.tsx`)
+- [ ] `LevelBadge` component (#13) — hexagonal level badge (`components/rpg/LevelBadge.tsx`)
+- [ ] `XPProgress` component (#14) — XP bar với animated fill (`components/rpg/XPProgress.tsx`)
+- [ ] `ClassBadge` component (#15) — player class icon + label (`components/rpg/ClassBadge.tsx`)
+- [ ] XP service + Stat service (#16) — `applyStatGains`, `checkLevelUp` vào `lib/rpg/`
+- [ ] Player profile screen (#17) — `app/(app)/profile/page.tsx` (15 stats, level, class, title)
 
-### W5 — Habit Tracking
-- [ ] Habit list page (`app/(app)/habits/page.tsx`)
-- [ ] Habit creation form
-- [ ] Daily check-off với streak counter
-- [ ] Firestore CRUD cho habits (`lib/queries/useHabits.ts`)
-
-### W6 — Quest System
-- [ ] Quest list page (`app/(app)/quests/page.tsx`) — tabs: Daily/Weekly/Main/Side/Boss
-- [ ] Quest creation form (manual)
-- [ ] Quest completion → XP gain → stat update
-- [ ] `QuestCard` component — quest list item
-- [ ] Firestore CRUD cho quests (`lib/queries/useQuests.ts`)
-
-### W7 — Level-Up Experience
-- [ ] `LevelUpOverlay` component — full-screen animation (Framer Motion)
+### W4 (GitHub #18–20) — Dashboard & Level-Up
+- [ ] Dashboard page (#20) — `app/(app)/home/page.tsx` ⚠️ hiện đang 404
+- [ ] `LevelUpOverlay` component (#18) — full-screen animation (Framer Motion)
 - [ ] `useLevelUp` hook — detect + trigger overlay
-- [ ] XP gain animation trên quest completion
+
+### W5 (GitHub #21–25) — Quest System
+- [ ] Quest data model + TanStack Query hooks (#21)
+- [ ] Quest list screen (#22)
+- [ ] `QuestCard` component (#23)
+- [ ] Quest creation form (#24)
+- [ ] Quest completion → XP gain → stat update (#25)
+
+### W6 (GitHub #26–29) — Habit Tracking
+- [ ] Habit data model + TanStack Query hooks (#26)
+- [ ] Habit list screen (#27)
+- [ ] Habit check-off + streak logic (#28)
+- [ ] Habit creation form (#29)
 
 ### W8 — Vercel Deploy
 - [x] `vercel.ts` config (security headers, cache, region sin1)
