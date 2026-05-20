@@ -27,11 +27,11 @@ Web version của app Solo Leveling — gamify personal development với RPG me
 - [x] Security headers `next.config.mjs` (CSP prod-only)
 - [x] Test files: authStore, firebase-auth, AuthProvider, login, signup
 
-### W3 — App Shell & Layout
-- [ ] Root layout với providers (QueryClient, AuthProvider)
-- [ ] Sidebar navigation (desktop)
-- [ ] Bottom navigation bar (mobile)
-- [ ] Top bar (mobile hamburger + user avatar)
+### W3 — App Shell & Layout ✅
+- [x] Root layout với providers (QueryClient, AuthProvider)
+- [x] Sidebar navigation (desktop)
+- [x] Bottom navigation bar (mobile)
+- [x] Top bar (mobile hamburger + user avatar)
 
 ### W4 — Player Profile & Dashboard
 - [ ] Dashboard page (`app/(app)/home/page.tsx`)
@@ -93,23 +93,22 @@ Web version của app Solo Leveling — gamify personal development với RPG me
 
 ---
 
-## 🔖 Dừng lại tại đây — 2026-05-14
+## 🔖 Dừng lại tại đây — 2026-05-21
 
 ### Đã xong hôm nay
-- [x] W2 hoàn thành toàn bộ Authentication
-- [x] Landing page ARISE, Login page, Signup page — UI Dark RPG hoàn chỉnh
-- [x] Firebase Auth (Email/Password + Google) hoạt động thực tế — đã test signup/login
-- [x] Password eye toggle, error messages tiếng Việt, security headers
-- [x] Code review: fix 2 bugs (mountedRef init, aria-invalid)
-- [x] Test files viết sẵn (cần `npm install` packages để chạy)
+- [x] W3 hoàn thành: NavSidebar, NavBottom, NavTopBar, AppLayout responsive
+- [x] Jest setup: 79 tests passing / 5 suites
+- [x] Extract `getAuthErrorMessage` → `lib/firebase/authErrors.ts`
+- [x] Fix UTF-8 encoding garbled trong login/page.tsx
+- [x] Fix `aria-invalid` hardcoded false trên email input (signup)
+- [x] PR #46 merged vào main
 
-### Làm tiếp ngày mai
-1. **[W3]** App Shell — tạo trang `/home` (hết 404 sau login)
-2. **[W3]** Sidebar navigation (desktop) + Bottom nav bar (mobile)
-3. **[W3]** Top bar (avatar + mobile hamburger)
-4. **[W8 còn lại]** Thêm Firebase env vars vào Vercel Dashboard → smoke test production URL
+### Làm tiếp — W4
+1. **[W4]** Dashboard page `/home` — StatBar, LevelBadge, XPProgress, ClassBadge
+2. **[W4]** Player profile screen (15 stats, level, class, title)
+3. **[W8]** Thêm Firebase env vars vào Vercel Dashboard → smoke test
 
 ### Ghi chú kỹ thuật
-- CSP headers chỉ apply trong production (dev tắt để tránh conflict với webpack eval-source-map + Chrome Trusted Types)
-- Test packages chưa install: `npm install -D jest jest-environment-jsdom @testing-library/react @testing-library/jest-dom @testing-library/user-event ts-jest @types/jest`
-- Suggestion chưa làm: extract `getAuthErrorMessage` ra `lib/firebase/authErrors.ts`
+- CSP headers chỉ apply trong production
+- jest 30 + ts-jest 29: chưa upgrade ts-jest 30 (còn beta)
+- `auth/account-exists-with-different-credential` chưa có trong authErrors map
