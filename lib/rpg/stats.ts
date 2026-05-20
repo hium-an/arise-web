@@ -32,3 +32,18 @@ export function computePlayerClass(stats: StatsMap): string {
   const dominant = Object.entries(clusters).find(([, v]) => v === max)
   return dominant ? classMap[dominant[0]] : 'Novice Hunter'
 }
+
+/**
+ * Cộng dồn stat gains vào stats hiện tại. Trả về StatsMap mới (immutable).
+ * Stats không thể âm — penalty được clamp về 0.
+ */
+export function applyStatGains(stats: StatsMap, gains: StatsMap): StatsMap {
+  const result: StatsMap = { ...stats }
+  for (const code of STAT_CODES) {
+    const gain = gains[code]
+    if (gain !== undefined && !Number.isNaN(gain)) {
+      result[code] = Math.max(0, (result[code] ?? 0) + gain)
+    }
+  }
+  return result
+}
