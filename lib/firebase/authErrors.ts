@@ -13,6 +13,9 @@ const AUTH_ERROR_MESSAGES: Record<string, string> = {
   'auth/email-already-in-use': 'Email này đã được đăng ký.',
   'auth/weak-password': 'Mật khẩu quá yếu. Cần ít nhất 8 ký tự, gồm chữ hoa, chữ thường và số.',
   'auth/operation-not-allowed': 'Phương thức đăng ký này chưa được bật.',
+  'permission-denied': 'Không có quyền thực hiện thao tác này.',
+  'unavailable': 'Dịch vụ tạm thời không khả dụng. Vui lòng thử lại.',
+  'not-found': 'Không tìm thấy dữ liệu.',
 }
 
 export function getAuthErrorMessage(error: unknown): string {
