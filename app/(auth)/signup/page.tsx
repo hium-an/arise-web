@@ -3,7 +3,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { deleteUser } from 'firebase/auth'
 import { signUpWithEmail } from '@/lib/firebase/auth'
+import { createUserProfile } from '@/lib/firebase/firestore'
 import { getAuthErrorMessage } from '@/lib/firebase/authErrors'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -20,23 +22,58 @@ export default function SignupPage() {
     }
   }, [])
 
+  const [displayName, setDisplayName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [error, setError] = useState('')
+  const [errorField, setErrorField] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
   const validate = (): string | null => {
-    if (!email.trim()) return 'Vui lòng nhập email.'
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return 'Email không hợp lệ.'
-    if (!password) return 'Vui lòng nhập mật khẩu.'
-    if (password.length < 8) return 'Mật khẩu phải có ít nhất 8 ký tự.'
-    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password))
+    if (!displayName.trim()) {
+      setErrorField('displayName')
+      return 'Vui lòng nhập tên hiển thị.'
+    }
+    if (displayName.trim().length > 50) {
+      setErrorField('displayName')
+      return 'Tên hiển thị không được vượt quá 50 ký tự.'
+    }
+    if (!/^[\p{L}\p{N}\s._\-]+$/u.test(displayName.trim())) {
+      setErrorField('displayName')
+      return 'Tên hiển thị chứa ký tự không hợp lệ.'
+    }
+    if (!email.trim()) {
+      setErrorField('email')
+      return 'Vui lòng nhập email.'
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setErrorField('email')
+      return 'Email không hợp lệ.'
+    }
+    if (!password) {
+      setErrorField('password')
+      return 'Vui lòng nhập mật khẩu.'
+    }
+    if (password.length < 8) {
+      setErrorField('password')
+      return 'Mật khẩu phải có ít nhất 8 ký tự.'
+    }
+    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+      setErrorField('password')
       return 'Mật khẩu cần chứa chữ hoa, chữ thường và số.'
-    if (!confirmPassword) return 'Vui lòng xác nhận mật khẩu.'
-    if (password !== confirmPassword) return 'Mật khẩu xác nhận không khớp.'
+    }
+    if (!confirmPassword) {
+      setErrorField('confirmPassword')
+      return 'Vui lòng xác nhận mật khẩu.'
+    }
+    if (password !== confirmPassword) {
+      setErrorField('confirmPassword')
+      return 'Mật khẩu xác nhận không khớp.'
+    }
+    setErrorField(null)
     return null
   }
 
@@ -52,7 +89,16 @@ export default function SignupPage() {
 
     setLoading(true)
     try {
-      await signUpWithEmail(email.trim(), password)
+      const result = await signUpWithEmail(email.trim(), password)
+      try {
+        await createUserProfile(result.user.uid, email.trim(), displayName.trim())
+      } catch (firestoreErr) {
+        // Rollback: xóa Auth user để tránh orphaned account
+        await deleteUser(result.user).catch((deleteErr) => {
+          console.error('[signup] Failed to rollback Auth user:', deleteErr)
+        })
+        throw firestoreErr
+      }
       if (mountedRef.current) router.replace('/home')
     } catch (err) {
       if (mountedRef.current) setError(getAuthErrorMessage(err))
@@ -129,6 +175,29 @@ export default function SignupPage() {
 
       <form onSubmit={handleSignup} noValidate aria-label="Tạo tài khoản mới" className="space-y-5">
 
+        {/* Display name */}
+        <div className="space-y-1.5">
+          <label
+            htmlFor="displayName"
+            className="block text-text-secondary text-[11px] font-display uppercase tracking-widest"
+          >
+            Tên hiển thị
+          </label>
+          <input
+            id="displayName"
+            type="text"
+            autoComplete="name"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            disabled={loading}
+            placeholder="Tên của bạn"
+            aria-required="true"
+            aria-invalid={errorField === 'displayName'}
+            aria-describedby={error ? errorId : undefined}
+            className={inputBase}
+          />
+        </div>
+
         {/* Email */}
         <div className="space-y-1.5">
           <label
@@ -146,7 +215,7 @@ export default function SignupPage() {
             disabled={loading}
             placeholder="hunter@arise.io"
             aria-required="true"
-            aria-invalid={!!error}
+            aria-invalid={errorField === 'email'}
             aria-describedby={error ? errorId : undefined}
             className={inputBase}
           />
@@ -170,7 +239,7 @@ export default function SignupPage() {
               disabled={loading}
               placeholder="Ít nhất 8 ký tự, chữ hoa, số"
               aria-required="true"
-              aria-invalid={!!error}
+              aria-invalid={errorField === 'password'}
               aria-describedby={error ? errorId : undefined}
               className={cn(inputBase, 'pr-10')}
             />
