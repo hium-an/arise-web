@@ -56,12 +56,12 @@ Web version của app Solo Leveling — gamify personal development với RPG me
 - [ ] `LevelUpOverlay` component (#18) — full-screen animation (Framer Motion)
 - [ ] `useLevelUp` hook — detect + trigger overlay
 
-### W5 (GitHub #21–25) — Quest System
-- [ ] Quest data model + TanStack Query hooks (#21)
-- [ ] Quest list screen (#22)
-- [ ] `QuestCard` component (#23)
-- [ ] Quest creation form (#24)
-- [ ] Quest completion → XP gain → stat update (#25)
+### W5 (GitHub #21–25) — Quest System ✅
+- [x] Quest data model + TanStack Query hooks (#21)
+- [x] Quest list screen (#22)
+- [x] `QuestCard` component (#23)
+- [x] Quest creation form (#24)
+- [x] Quest completion → XP gain → stat update (#25)
 
 ### W6 (GitHub #26–29) — Habit Tracking
 - [ ] Habit data model + TanStack Query hooks (#26)
