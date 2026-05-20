@@ -34,14 +34,13 @@ Web version của app Solo Leveling — gamify personal development với RPG me
 - [x] Top bar (mobile hamburger + user avatar) — NavTopBar
 - [x] Active state highlight với glow effect
 
-### W3 (GitHub #12–17) — RPG Components & Player Profile
-> ⚠️ Đây là W3 thật theo GitHub board — cần làm trước W4 Dashboard
-- [ ] `StatBar` component (#12) — glowing RPG stat progress bar (`components/rpg/StatBar.tsx`)
-- [ ] `LevelBadge` component (#13) — hexagonal level badge (`components/rpg/LevelBadge.tsx`)
-- [ ] `XPProgress` component (#14) — XP bar với animated fill (`components/rpg/XPProgress.tsx`)
-- [ ] `ClassBadge` component (#15) — player class icon + label (`components/rpg/ClassBadge.tsx`)
-- [ ] XP service + Stat service (#16) — `applyStatGains`, `checkLevelUp` vào `lib/rpg/`
-- [ ] Player profile screen (#17) — `app/(app)/profile/page.tsx` (15 stats, level, class, title)
+### W3 (GitHub #12–17) — RPG Components & Player Profile ✅
+- [x] `StatBar` component (#12) — glowing RPG stat progress bar (`components/rpg/StatBar.tsx`)
+- [x] `LevelBadge` component (#13) — hexagonal level badge (`components/rpg/LevelBadge.tsx`)
+- [x] `XPProgress` component (#14) — XP bar với animated fill (`components/rpg/XPProgress.tsx`)
+- [x] `ClassBadge` component (#15) — player class icon + label (`components/rpg/ClassBadge.tsx`)
+- [x] XP service + Stat service (#16) — `applyStatGains`, `checkLevelUp` vào `lib/rpg/`
+- [x] Player profile screen (#17) — `app/(app)/profile/page.tsx` (15 stats, level, class, title)
 
 ### W4 (GitHub #18–20) — Dashboard & Level-Up
 - [ ] Dashboard page (#20) — `app/(app)/home/page.tsx` ⚠️ hiện đang 404
