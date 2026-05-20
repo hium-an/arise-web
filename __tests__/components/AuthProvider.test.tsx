@@ -35,6 +35,24 @@ jest.mock('@/lib/firebase/auth', () => ({
   signOut: jest.fn(),
 }))
 
+// ─── Mock: firebase/firestore ─────────────────────────────────────────────────
+const mockGetDoc = jest.fn()
+const mockDoc = jest.fn(() => 'mock-doc-ref')
+jest.mock('firebase/firestore', () => ({
+  getDoc: (...args: unknown[]) => mockGetDoc(...args),
+  doc: (...args: unknown[]) => mockDoc(...args),
+  getFirestore: jest.fn(() => ({ name: 'mock-db' })),
+  setDoc: jest.fn(),
+  serverTimestamp: jest.fn(() => ({ seconds: 0 })),
+}))
+
+// ─── Mock: @/lib/firebase/firestore ──────────────────────────────────────────
+const mockCreateUserProfile = jest.fn()
+jest.mock('@/lib/firebase/firestore', () => ({
+  db: { name: 'mock-db' },
+  createUserProfile: (...args: unknown[]) => mockCreateUserProfile(...args),
+}))
+
 // ─── Mock: zustand authStore ──────────────────────────────────────────────────
 const mockSetAuthState = jest.fn()
 jest.mock('@/lib/store/authStore', () => ({
@@ -183,5 +201,88 @@ describe('AuthProvider', () => {
 
     expect(mockSetAuthState).toHaveBeenCalledWith(fakeUser)
     expect(mockSetAuthState).toHaveBeenCalledTimes(1)
+  })
+
+  // ─── ensureUserProfile ────────────────────────────────────────────────────
+  describe('ensureUserProfile', () => {
+    it('không gọi createUserProfile nếu Firestore profile đã tồn tại', async () => {
+      const fakeUser = makeFakeUser()
+      // getDoc trả về document đã tồn tại
+      mockGetDoc.mockResolvedValueOnce({ exists: () => true })
+
+      let capturedCallback: ((user: User | null) => void) | null = null
+      mockOnAuthStateChanged.mockImplementationOnce(
+        (_auth: unknown, callback: (user: User | null) => void) => {
+          capturedCallback = callback
+          return jest.fn()
+        }
+      )
+
+      render(<AuthProvider><div /></AuthProvider>)
+      await act(async () => { capturedCallback!(fakeUser) })
+
+      expect(mockCreateUserProfile).not.toHaveBeenCalled()
+    })
+
+    it('gọi createUserProfile nếu Firestore profile chưa tồn tại (Google Sign-In)', async () => {
+      const fakeUser = { uid: 'google-uid', email: 'user@gmail.com', displayName: 'Google User' } as User
+      // getDoc trả về document không tồn tại
+      mockGetDoc.mockResolvedValueOnce({ exists: () => false })
+      mockCreateUserProfile.mockResolvedValueOnce(undefined)
+
+      let capturedCallback: ((user: User | null) => void) | null = null
+      mockOnAuthStateChanged.mockImplementationOnce(
+        (_auth: unknown, callback: (user: User | null) => void) => {
+          capturedCallback = callback
+          return jest.fn()
+        }
+      )
+
+      render(<AuthProvider><div /></AuthProvider>)
+      await act(async () => { capturedCallback!(fakeUser) })
+
+      expect(mockCreateUserProfile).toHaveBeenCalledWith(
+        'google-uid',
+        'user@gmail.com',
+        'Google User',
+      )
+    })
+
+    it('dùng email prefix làm displayName nếu user không có displayName', async () => {
+      const fakeUser = { uid: 'uid-x', email: 'hunter@arise.io', displayName: null } as unknown as User
+      mockGetDoc.mockResolvedValueOnce({ exists: () => false })
+      mockCreateUserProfile.mockResolvedValueOnce(undefined)
+
+      let capturedCallback: ((user: User | null) => void) | null = null
+      mockOnAuthStateChanged.mockImplementationOnce(
+        (_auth: unknown, callback: (user: User | null) => void) => {
+          capturedCallback = callback
+          return jest.fn()
+        }
+      )
+
+      render(<AuthProvider><div /></AuthProvider>)
+      await act(async () => { capturedCallback!(fakeUser) })
+
+      expect(mockCreateUserProfile).toHaveBeenCalledWith('uid-x', 'hunter@arise.io', 'hunter')
+    })
+
+    it('không gọi ensureUserProfile khi user là null (logout)', async () => {
+      mockGetDoc.mockResolvedValueOnce({ exists: () => false })
+
+      let capturedCallback: ((user: User | null) => void) | null = null
+      mockOnAuthStateChanged.mockImplementationOnce(
+        (_auth: unknown, callback: (user: User | null) => void) => {
+          capturedCallback = callback
+          return jest.fn()
+        }
+      )
+
+      render(<AuthProvider><div /></AuthProvider>)
+      await act(async () => { capturedCallback!(null) })
+
+      expect(mockGetDoc).not.toHaveBeenCalled()
+      expect(mockCreateUserProfile).not.toHaveBeenCalled()
+    })
   })
 })
