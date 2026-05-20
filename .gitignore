@@ -29,3 +29,6 @@ yarn-error.log*
 
 # Testing
 coverage/
+
+# Local docs — test checklists, notes (không push lên git)
+docs/local/

@@ -11,12 +11,10 @@ const mockSignInWithEmailAndPassword = jest.fn()
 const mockCreateUserWithEmailAndPassword = jest.fn()
 const mockSignInWithPopup = jest.fn()
 const mockSignOut = jest.fn()
-const mockGetAuth = jest.fn(() => ({ name: 'mock-auth-instance' }))
-const mockGoogleAuthProvider = jest.fn()
 
 jest.mock('firebase/auth', () => ({
-  getAuth: () => mockGetAuth(),
-  GoogleAuthProvider: mockGoogleAuthProvider,
+  getAuth: jest.fn(() => ({ name: 'mock-auth-instance' })),
+  GoogleAuthProvider: jest.fn(),
   signInWithEmailAndPassword: (...args: unknown[]) =>
     mockSignInWithEmailAndPassword(...args),
   createUserWithEmailAndPassword: (...args: unknown[]) =>
@@ -54,6 +52,7 @@ function makeFirebaseError(code: string, message = 'Firebase error'): FirebaseEr
   const err = new Error(message) as FirebaseError
   // FirebaseError có thuộc tính `code`
   Object.assign(err, { code, name: 'FirebaseError' })
+  Object.setPrototypeOf(err, FirebaseError.prototype)
   return err
 }
 

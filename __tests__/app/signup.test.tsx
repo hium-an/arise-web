@@ -52,8 +52,8 @@ function makeFirebaseError(code: string): FirebaseError {
 // ─── Helper: điền form hợp lệ ────────────────────────────────────────────
 async function fillValidForm(
   email = 'hunter@arise.io',
-  password = 'securepass',
-  confirmPassword = 'securepass'
+  password = 'SecurePass1',
+  confirmPassword = 'SecurePass1'
 ) {
   await userEvent.type(screen.getByLabelText(/email/i), email)
   await userEvent.type(screen.getByLabelText(/^mật khẩu$/i), password)
@@ -137,7 +137,7 @@ describe('SignupPage', () => {
       })
     })
 
-    it('hiển thị lỗi khi mật khẩu ít hơn 6 ký tự', async () => {
+    it('hiển thị lỗi khi mật khẩu ít hơn 8 ký tự', async () => {
       render(<SignupPage />)
 
       await userEvent.type(screen.getByLabelText(/email/i), 'hunter@arise.io')
@@ -146,7 +146,7 @@ describe('SignupPage', () => {
 
       await waitFor(() => {
         expect(screen.getByRole('alert')).toHaveTextContent(
-          'Mật khẩu phải có ít nhất 6 ký tự.'
+          'Mật khẩu phải có ít nhất 8 ký tự.'
         )
       })
     })
@@ -155,7 +155,7 @@ describe('SignupPage', () => {
       render(<SignupPage />)
 
       await userEvent.type(screen.getByLabelText(/email/i), 'hunter@arise.io')
-      await userEvent.type(screen.getByLabelText(/^mật khẩu$/i), 'securepass')
+      await userEvent.type(screen.getByLabelText(/^mật khẩu$/i), 'SecurePass1')
       fireEvent.click(screen.getByRole('button', { name: /tạo tài khoản/i }))
 
       await waitFor(() => {
@@ -169,8 +169,8 @@ describe('SignupPage', () => {
       render(<SignupPage />)
 
       await userEvent.type(screen.getByLabelText(/email/i), 'hunter@arise.io')
-      await userEvent.type(screen.getByLabelText(/^mật khẩu$/i), 'securepass')
-      await userEvent.type(screen.getByLabelText(/xác nhận mật khẩu/i), 'differentpass')
+      await userEvent.type(screen.getByLabelText(/^mật khẩu$/i), 'SecurePass1')
+      await userEvent.type(screen.getByLabelText(/xác nhận mật khẩu/i), 'WrongPass1')
       fireEvent.click(screen.getByRole('button', { name: /tạo tài khoản/i }))
 
       await waitFor(() => {
@@ -192,8 +192,8 @@ describe('SignupPage', () => {
     it('hiển thị badge "CHƯA KHỚP" khi mật khẩu và xác nhận khác nhau', async () => {
       render(<SignupPage />)
 
-      await userEvent.type(screen.getByLabelText(/^mật khẩu$/i), 'password1')
-      await userEvent.type(screen.getByLabelText(/xác nhận mật khẩu/i), 'password2')
+      await userEvent.type(screen.getByLabelText(/^mật khẩu$/i), 'SecurePass1')
+      await userEvent.type(screen.getByLabelText(/xác nhận mật khẩu/i), 'WrongPass1')
 
       await waitFor(() => {
         expect(screen.getByText('CHƯA KHỚP')).toBeInTheDocument()
@@ -203,8 +203,8 @@ describe('SignupPage', () => {
     it('hiển thị badge "KHỚP" khi mật khẩu và xác nhận giống nhau', async () => {
       render(<SignupPage />)
 
-      await userEvent.type(screen.getByLabelText(/^mật khẩu$/i), 'password1')
-      await userEvent.type(screen.getByLabelText(/xác nhận mật khẩu/i), 'password1')
+      await userEvent.type(screen.getByLabelText(/^mật khẩu$/i), 'SecurePass1')
+      await userEvent.type(screen.getByLabelText(/xác nhận mật khẩu/i), 'SecurePass1')
 
       await waitFor(() => {
         expect(screen.getByText('KHỚP')).toBeInTheDocument()
@@ -222,7 +222,7 @@ describe('SignupPage', () => {
       fireEvent.click(screen.getByRole('button', { name: /tạo tài khoản/i }))
 
       await waitFor(() => {
-        expect(mockSignUpWithEmail).toHaveBeenCalledWith('hunter@arise.io', 'securepass')
+        expect(mockSignUpWithEmail).toHaveBeenCalledWith('hunter@arise.io', 'SecurePass1')
       })
     })
 
@@ -243,12 +243,12 @@ describe('SignupPage', () => {
       render(<SignupPage />)
 
       await userEvent.type(screen.getByLabelText(/email/i), '  hunter@arise.io  ')
-      await userEvent.type(screen.getByLabelText(/^mật khẩu$/i), 'securepass')
-      await userEvent.type(screen.getByLabelText(/xác nhận mật khẩu/i), 'securepass')
+      await userEvent.type(screen.getByLabelText(/^mật khẩu$/i), 'SecurePass1')
+      await userEvent.type(screen.getByLabelText(/xác nhận mật khẩu/i), 'SecurePass1')
       fireEvent.click(screen.getByRole('button', { name: /tạo tài khoản/i }))
 
       await waitFor(() => {
-        expect(mockSignUpWithEmail).toHaveBeenCalledWith('hunter@arise.io', 'securepass')
+        expect(mockSignUpWithEmail).toHaveBeenCalledWith('hunter@arise.io', 'SecurePass1')
       })
     })
   })

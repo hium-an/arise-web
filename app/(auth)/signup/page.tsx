@@ -3,24 +3,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { FirebaseError } from 'firebase/app'
 import { signUpWithEmail } from '@/lib/firebase/auth'
+import { getAuthErrorMessage } from '@/lib/firebase/authErrors'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
-function getErrorMessage(error: unknown): string {
-  if (!(error instanceof FirebaseError)) return 'Đã xảy ra lỗi. Vui lòng thử lại.'
-
-  const messages: Record<string, string> = {
-    'auth/email-already-in-use': 'Email này đã được đăng ký.',
-    'auth/invalid-email': 'Email không hợp lệ.',
-    'auth/weak-password': 'Mật khẩu quá yếu. Cần ít nhất 8 ký tự, gồm chữ hoa, chữ thường và số.',
-    'auth/operation-not-allowed': 'Phương thức đăng ký này chưa được bật.',
-    'auth/network-request-failed': 'Lỗi mạng. Kiểm tra kết nối internet.',
-  }
-
-  return messages[error.code] ?? 'Đã xảy ra lỗi. Vui lòng thử lại.'
-}
 
 export default function SignupPage() {
   const router = useRouter()
@@ -68,7 +55,7 @@ export default function SignupPage() {
       await signUpWithEmail(email.trim(), password)
       if (mountedRef.current) router.replace('/home')
     } catch (err) {
-      if (mountedRef.current) setError(getErrorMessage(err))
+      if (mountedRef.current) setError(getAuthErrorMessage(err))
     } finally {
       if (mountedRef.current) setLoading(false)
     }
@@ -159,7 +146,7 @@ export default function SignupPage() {
             disabled={loading}
             placeholder="hunter@arise.io"
             aria-required="true"
-            aria-invalid={false}
+            aria-invalid={!!error}
             aria-describedby={error ? errorId : undefined}
             className={inputBase}
           />
