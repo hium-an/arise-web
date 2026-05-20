@@ -42,11 +42,14 @@ Web version của app Solo Leveling — gamify personal development với RPG me
 - [x] XP service + Stat service (#16) — `applyStatGains`, `checkLevelUp` vào `lib/rpg/`
 - [x] Player profile screen (#17) — `app/(app)/profile/page.tsx` (15 stats, level, class, title)
 
-### Gaps chưa làm từ W2 (ghi nhận, làm sau)
-- [ ] Signup: Display name field (#10) — form hiện chỉ có email + password
-- [ ] Signup: Tạo Firestore user document khi đăng ký (#10) — chỉ tạo Firebase Auth
-- [ ] RPG card base component (#8) — hiện dùng shadcn Card tạm
-- [ ] `useAuth()` hook (#11) — hiện dùng `useAuthStore()` trực tiếp
+### Gaps từ W2 — đã hoàn thành (PR #49)
+- [x] Signup: Display name field (#10)
+- [x] Signup: Tạo Firestore user document khi đăng ký (#10) + rollback nếu fail
+- [x] RPG card base component (#8) — `components/ui/rpg-card.tsx`
+- [x] `useAuth()` hook (#11) — `lib/hooks/useAuth.ts`
+- [x] Google Sign-In tự tạo Firestore profile nếu chưa có (`AuthProvider.ensureUserProfile`)
+- [x] Firestore database tạo xong (asia-southeast1) + security rules deployed
+- [ ] Language standardization (#48) — UI còn tiếng Việt/Anh lẫn lộn
 
 ### W4 (GitHub #18–20) — Dashboard & Level-Up
 - [ ] Dashboard page (#20) — `app/(app)/home/page.tsx` ⚠️ hiện đang 404
