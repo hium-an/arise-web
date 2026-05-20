@@ -5,6 +5,16 @@ export type QuestStatus = 'pending' | 'active' | 'completed' | 'failed'
 export type LifeDomain = 'physical' | 'mental' | 'financial' | 'social' | 'discipline'
 export type HabitFrequency = 'daily' | 'weekly'
 
+export interface CreateQuestInput {
+  title: string
+  description?: string
+  type: QuestType
+  domain: LifeDomain
+  xpReward: number
+  statGains: StatsMap
+  deadline?: Date
+}
+
 export interface UserProfile {
   id: string
   email: string
