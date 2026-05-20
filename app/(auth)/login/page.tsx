@@ -3,29 +3,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { FirebaseError } from 'firebase/app'
 import { signInWithEmail, signInWithGoogle } from '@/lib/firebase/auth'
+import { getAuthErrorMessage } from '@/lib/firebase/authErrors'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-
-// Map Firebase error codes to Vietnamese messages
-function getErrorMessage(error: unknown): string {
-  if (!(error instanceof FirebaseError)) return '�� x?y ra l?i. Vui l�ng th? l?i.'
-
-  const messages: Record<string, string> = {
-    'auth/user-not-found': 'Email ho?c m?t kh?u kh�ng d�ng.',
-    'auth/wrong-password': 'Email ho?c m?t kh?u kh�ng d�ng.',
-    'auth/invalid-email': 'Email kh�ng h?p l?.',
-    'auth/invalid-credential': 'Email ho?c m?t kh?u kh�ng d�ng.',
-    'auth/user-disabled': 'T�i kho?n d� b? v� hi?u h�a.',
-    'auth/too-many-requests': 'Qu� nhi?u l?n th?. Vui l�ng th? l?i sau.',
-    'auth/network-request-failed': 'L?i m?ng. Ki?m tra k?t n?i internet.',
-    'auth/popup-closed-by-user': '�ang nh?p b? h?y.',
-    'auth/popup-blocked': 'Popup b? ch?n. Vui l�ng cho ph�p popup.',
-  }
-
-  return messages[error.code] ?? '�� x?y ra l?i. Vui l�ng th? l?i.'
-}
 
 export default function LoginPage() {
   const router = useRouter()
@@ -50,11 +31,11 @@ export default function LoginPage() {
     setError('')
 
     if (!email.trim()) {
-      setError('Vui l�ng nh?p email.')
+      setError('Vui lòng nhập email.')
       return
     }
     if (!password) {
-      setError('Vui l�ng nh?p m?t kh?u.')
+      setError('Vui lòng nhập mật khẩu.')
       return
     }
 
@@ -63,7 +44,7 @@ export default function LoginPage() {
       await signInWithEmail(email.trim(), password)
       if (mountedRef.current) router.replace('/home')
     } catch (err) {
-      if (mountedRef.current) setError(getErrorMessage(err))
+      if (mountedRef.current) setError(getAuthErrorMessage(err))
     } finally {
       if (mountedRef.current) setLoadingEmail(false)
     }
@@ -76,7 +57,7 @@ export default function LoginPage() {
       await signInWithGoogle()
       if (mountedRef.current) router.replace('/home')
     } catch (err) {
-      if (mountedRef.current) setError(getErrorMessage(err))
+      if (mountedRef.current) setError(getAuthErrorMessage(err))
     } finally {
       if (mountedRef.current) setLoadingGoogle(false)
     }
@@ -86,7 +67,7 @@ export default function LoginPage() {
 
   const errorId = 'login-error'
 
-  // Shared input styling � cyan focus ring via globals.css `.input-glow`
+  // Shared input styling — cyan focus ring via globals.css `.input-glow`
   const inputClass = cn(
     'w-full px-4 py-3 rounded-md text-sm',
     'bg-surface border border-border',
@@ -118,12 +99,12 @@ export default function LoginPage() {
           />
         </div>
         <p className="text-text-secondary text-sm tracking-wide">
-          Ch�o m?ng tr? l?i,{' '}
+          Chào mừng trở lại,{' '}
           <span className="text-neon-blue/80 font-medium">Hunter</span>
         </p>
         <div aria-hidden="true" className="flex items-center justify-center gap-2 mt-2">
           <div className="h-px w-8 bg-neon-blue/25" />
-          <span className="text-neon-blue/35 text-xs font-display">?</span>
+          <span className="text-neon-blue/35 text-xs font-display">◆</span>
           <div className="h-px w-8 bg-neon-blue/25" />
         </div>
       </header>
@@ -149,7 +130,7 @@ export default function LoginPage() {
       )}
 
       {/* -- Email / Password form -- */}
-      <form onSubmit={handleEmailLogin} noValidate aria-label="�ang nh?p b?ng email" className="space-y-5">
+      <form onSubmit={handleEmailLogin} noValidate aria-label="Đăng nhập bằng email" className="space-y-5">
         <div className="space-y-1.5">
           <label
             htmlFor="email"
@@ -177,7 +158,7 @@ export default function LoginPage() {
             htmlFor="password"
             className="block text-text-secondary text-[11px] font-display uppercase tracking-widest"
           >
-            M?t kh?u
+            Mật khẩu
           </label>
           <div className="relative">
             <input
@@ -187,7 +168,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={isLoading}
-              placeholder="��������"
+              placeholder="••••••••"
               aria-required="true"
               aria-invalid={!!error}
               aria-describedby={error ? errorId : undefined}
@@ -196,7 +177,7 @@ export default function LoginPage() {
             <button
               type="button"
               tabIndex={-1}
-              aria-label={showPassword ? '?n m?t kh?u' : 'Hi?n m?t kh?u'}
+              aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
               onClick={() => setShowPassword((v) => !v)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-text-disabled hover:text-text-secondary transition-colors"
             >
@@ -233,10 +214,10 @@ export default function LoginPage() {
                 className="w-4 h-4 border-2 border-background border-t-transparent rounded-full animate-spin"
                 aria-hidden="true"
               />
-              �ANG �ANG NH?P...
+              ĐANG ĐĂNG NHẬP...
             </span>
           ) : (
-            '�ANG NH?P'
+            'ĐĂNG NHẬP'
           )}
         </Button>
       </form>
@@ -245,7 +226,7 @@ export default function LoginPage() {
       <div aria-hidden="true" className="my-6 flex items-center gap-3">
         <div className="flex-1 h-px bg-border" />
         <span className="text-text-disabled text-[10px] font-display uppercase tracking-[0.3em]">
-          ho?c
+          hoặc
         </span>
         <div className="flex-1 h-px bg-border" />
       </div>
@@ -271,24 +252,24 @@ export default function LoginPage() {
               className="w-4 h-4 border-2 border-neon-blue border-t-transparent rounded-full animate-spin"
               aria-hidden="true"
             />
-            �ang k?t n?i...
+            Đang kết nối...
           </span>
         ) : (
           <>
             <GoogleIcon />
-            Ti?p t?c v?i Google
+            Tiếp tục với Google
           </>
         )}
       </Button>
 
       {/* -- Sign-up link -- */}
       <p className="mt-7 text-center text-text-secondary text-sm">
-        Chua c� t�i kho?n?{' '}
+        Chưa có tài khoản?{' '}
         <Link
           href="/signup"
           className="text-neon-blue hover:text-neon-blue/80 transition-colors font-semibold underline-offset-2 hover:underline"
         >
-          �ang k� ngay
+          Đăng ký ngay
         </Link>
       </p>
 

@@ -61,12 +61,12 @@ describe('LoginPage', () => {
   describe('render giao diện', () => {
     it('hiển thị input email', () => {
       render(<LoginPage />)
-      expect(screen.getByLabelText(/email/i)).toBeInTheDocument()
+      expect(screen.getByRole('textbox', { name: /email/i })).toBeInTheDocument()
     })
 
     it('hiển thị input mật khẩu', () => {
       render(<LoginPage />)
-      expect(screen.getByLabelText(/mật khẩu/i)).toBeInTheDocument()
+      expect(screen.getByLabelText(/^mật khẩu$/i)).toBeInTheDocument()
     })
 
     it('hiển thị nút Đăng nhập', () => {
@@ -103,7 +103,7 @@ describe('LoginPage', () => {
     it('hiển thị lỗi khi nhập email nhưng không nhập mật khẩu', async () => {
       render(<LoginPage />)
 
-      await userEvent.type(screen.getByLabelText(/email/i), 'hunter@arise.io')
+      await userEvent.type(screen.getByRole('textbox', { name: /email/i }), 'hunter@arise.io')
       fireEvent.submit(screen.getByRole('form', { hidden: true }) ?? screen.getByLabelText(/đăng nhập bằng email/i))
 
       await waitFor(() => {
@@ -127,8 +127,8 @@ describe('LoginPage', () => {
       mockSignInWithEmail.mockResolvedValueOnce({ user: { uid: '123' } })
       render(<LoginPage />)
 
-      await userEvent.type(screen.getByLabelText(/email/i), 'hunter@arise.io')
-      await userEvent.type(screen.getByLabelText(/mật khẩu/i), 'password123')
+      await userEvent.type(screen.getByRole('textbox', { name: /email/i }), 'hunter@arise.io')
+      await userEvent.type(screen.getByLabelText(/^mật khẩu$/i), 'password123')
       fireEvent.click(screen.getByRole('button', { name: /đăng nhập/i }))
 
       await waitFor(() => {
@@ -140,8 +140,8 @@ describe('LoginPage', () => {
       mockSignInWithEmail.mockResolvedValueOnce({ user: { uid: '123' } })
       render(<LoginPage />)
 
-      await userEvent.type(screen.getByLabelText(/email/i), 'hunter@arise.io')
-      await userEvent.type(screen.getByLabelText(/mật khẩu/i), 'password123')
+      await userEvent.type(screen.getByRole('textbox', { name: /email/i }), 'hunter@arise.io')
+      await userEvent.type(screen.getByLabelText(/^mật khẩu$/i), 'password123')
       fireEvent.click(screen.getByRole('button', { name: /đăng nhập/i }))
 
       await waitFor(() => {
@@ -159,8 +159,8 @@ describe('LoginPage', () => {
       )
       render(<LoginPage />)
 
-      await userEvent.type(screen.getByLabelText(/email/i), 'hunter@arise.io')
-      await userEvent.type(screen.getByLabelText(/mật khẩu/i), 'password123')
+      await userEvent.type(screen.getByRole('textbox', { name: /email/i }), 'hunter@arise.io')
+      await userEvent.type(screen.getByLabelText(/^mật khẩu$/i), 'password123')
       fireEvent.click(screen.getByRole('button', { name: /đăng nhập/i }))
 
       await waitFor(() => {
@@ -172,8 +172,8 @@ describe('LoginPage', () => {
       mockSignInWithEmail.mockImplementationOnce(() => new Promise(() => {}))
       render(<LoginPage />)
 
-      await userEvent.type(screen.getByLabelText(/email/i), 'hunter@arise.io')
-      await userEvent.type(screen.getByLabelText(/mật khẩu/i), 'password123')
+      await userEvent.type(screen.getByRole('textbox', { name: /email/i }), 'hunter@arise.io')
+      await userEvent.type(screen.getByLabelText(/^mật khẩu$/i), 'password123')
       fireEvent.click(screen.getByRole('button', { name: /đăng nhập/i }))
 
       await waitFor(() => {
@@ -192,8 +192,8 @@ describe('LoginPage', () => {
       )
       render(<LoginPage />)
 
-      await userEvent.type(screen.getByLabelText(/email/i), 'hunter@arise.io')
-      await userEvent.type(screen.getByLabelText(/mật khẩu/i), 'wrongpass')
+      await userEvent.type(screen.getByRole('textbox', { name: /email/i }), 'hunter@arise.io')
+      await userEvent.type(screen.getByLabelText(/^mật khẩu$/i), 'wrongpass')
       fireEvent.click(screen.getByRole('button', { name: /đăng nhập/i }))
 
       await waitFor(() => {
@@ -209,8 +209,8 @@ describe('LoginPage', () => {
       )
       render(<LoginPage />)
 
-      await userEvent.type(screen.getByLabelText(/email/i), 'ghost@arise.io')
-      await userEvent.type(screen.getByLabelText(/mật khẩu/i), 'pass123')
+      await userEvent.type(screen.getByRole('textbox', { name: /email/i }), 'ghost@arise.io')
+      await userEvent.type(screen.getByLabelText(/^mật khẩu$/i), 'pass123')
       fireEvent.click(screen.getByRole('button', { name: /đăng nhập/i }))
 
       await waitFor(() => {
@@ -224,8 +224,8 @@ describe('LoginPage', () => {
       )
       render(<LoginPage />)
 
-      await userEvent.type(screen.getByLabelText(/email/i), 'hunter@arise.io')
-      await userEvent.type(screen.getByLabelText(/mật khẩu/i), 'pass')
+      await userEvent.type(screen.getByRole('textbox', { name: /email/i }), 'hunter@arise.io')
+      await userEvent.type(screen.getByLabelText(/^mật khẩu$/i), 'pass')
       fireEvent.click(screen.getByRole('button', { name: /đăng nhập/i }))
 
       await waitFor(() => {
@@ -237,8 +237,8 @@ describe('LoginPage', () => {
       mockSignInWithEmail.mockRejectedValueOnce(new Error('Network error'))
       render(<LoginPage />)
 
-      await userEvent.type(screen.getByLabelText(/email/i), 'hunter@arise.io')
-      await userEvent.type(screen.getByLabelText(/mật khẩu/i), 'pass')
+      await userEvent.type(screen.getByRole('textbox', { name: /email/i }), 'hunter@arise.io')
+      await userEvent.type(screen.getByLabelText(/^mật khẩu$/i), 'pass')
       fireEvent.click(screen.getByRole('button', { name: /đăng nhập/i }))
 
       await waitFor(() => {
@@ -254,8 +254,8 @@ describe('LoginPage', () => {
       )
       render(<LoginPage />)
 
-      await userEvent.type(screen.getByLabelText(/email/i), 'hunter@arise.io')
-      await userEvent.type(screen.getByLabelText(/mật khẩu/i), 'wrongpass')
+      await userEvent.type(screen.getByRole('textbox', { name: /email/i }), 'hunter@arise.io')
+      await userEvent.type(screen.getByLabelText(/^mật khẩu$/i), 'wrongpass')
       fireEvent.click(screen.getByRole('button', { name: /đăng nhập/i }))
 
       await waitFor(() => {
