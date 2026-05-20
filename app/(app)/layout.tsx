@@ -7,12 +7,15 @@ import { cn } from '@/lib/utils'
 import NavSidebar from '@/components/nav/NavSidebar'
 import NavBottom from '@/components/nav/NavBottom'
 import NavTopBar from '@/components/nav/NavTopBar'
+import LevelUpOverlay from '@/components/rpg/LevelUpOverlay'
+import useLevelUp from '@/lib/hooks/useLevelUp'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuthStore()
   const router = useRouter()
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const { levelUpEvent, dismissLevelUp } = useLevelUp()
 
   // Auth guard — redirect to login if not authenticated
   useEffect(() => {
@@ -84,7 +87,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       />
 
       {/* Main content area */}
-      <main
+      <div
         className={cn(
           'min-h-screen',
           'lg:ml-[240px]',      // offset for desktop sidebar
@@ -93,10 +96,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         )}
       >
         {children}
-      </main>
+      </div>
 
       {/* Mobile / Tablet bottom nav — hidden on lg+ */}
       <NavBottom className="flex lg:hidden" />
+
+      {/* Level-up overlay — rendered at app-shell level so it appears on any page */}
+      <LevelUpOverlay event={levelUpEvent} onDismiss={dismissLevelUp} />
 
     </div>
   )

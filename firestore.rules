@@ -3,9 +3,14 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Users collection: chỉ user đó mới đọc/ghi được profile của mình
+    // Users collection + tất cả subcollections (quests, habits, goals, ...):
+    // chỉ user đó mới đọc/ghi được data của mình
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      match /{subcollection=**} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
     }
 
     // Mặc định: block tất cả
