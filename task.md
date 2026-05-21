@@ -63,11 +63,11 @@ Web version của app Solo Leveling — gamify personal development với RPG me
 - [x] Quest creation form (#24)
 - [x] Quest completion → XP gain → stat update (#25)
 
-### W6 (GitHub #26–29) — Habit Tracking
-- [ ] Habit data model + TanStack Query hooks (#26)
-- [ ] Habit list screen (#27)
-- [ ] Habit check-off + streak logic (#28)
-- [ ] Habit creation form (#29)
+### W6 (GitHub #26–29) — Habit Tracking ✅
+- [x] Habit data model + TanStack Query hooks (#26)
+- [x] Habit list screen (#27)
+- [x] Habit check-off + streak logic (#28)
+- [x] Habit creation form (#29)
 
 ### W8 — Vercel Deploy
 - [x] `vercel.ts` config (security headers, cache, region sin1)
