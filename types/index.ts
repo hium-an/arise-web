@@ -66,3 +66,11 @@ export interface Habit {
   isActive: boolean
   createdAt: Date
 }
+
+export interface CreateHabitInput {
+  title: string
+  description?: string
+  domain: LifeDomain
+  frequency: HabitFrequency
+  statGains: StatsMap
+}
