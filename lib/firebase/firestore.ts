@@ -17,7 +17,7 @@ import { STAT_CODES } from '@/lib/rpg/stats'
 import { xpRequiredForLevel, calculateLevel } from '@/lib/rpg/xp'
 import { applyStatGains, computePlayerClass } from '@/lib/rpg/stats'
 import type { StatsMap } from '@/lib/rpg/stats'
-import type { Quest, QuestStatus, CreateQuestInput } from '@/types'
+import type { Quest, QuestStatus, CreateQuestInput, Habit, CreateHabitInput, HabitFrequency } from '@/types'
 
 export const db = getFirestore(app)
 
@@ -56,6 +56,14 @@ function toDate(value: unknown): Date {
   if (value instanceof Timestamp) return value.toDate()
   if (value instanceof Date) return value
   return new Date()
+}
+
+/** Returns YYYY-MM-DD in the user's local timezone (avoids UTC-shift bugs). */
+function localDateStr(date: Date = new Date()): string {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
 }
 
 function rawToQuest(id: string, raw: Record<string, unknown>): Quest {
@@ -283,4 +291,157 @@ export async function getUserProfile(uid: string) {
   const userSnap = await getDoc(doc(db, 'users', uid))
   if (!userSnap.exists()) throw new Error('User profile not found')
   return userSnap.data()
+}
+
+// ─── Firestore → Habit mapper ─────────────────────────────────────────────────
+
+function rawToHabit(id: string, raw: Record<string, unknown>): Habit {
+  return {
+    id,
+    userId: typeof raw.userId === 'string' ? raw.userId : '',
+    title: typeof raw.title === 'string' ? raw.title : '',
+    description: typeof raw.description === 'string' ? raw.description : undefined,
+    domain: typeof raw.domain === 'string' ? (raw.domain as Habit['domain']) : 'discipline',
+    frequency: typeof raw.frequency === 'string' ? (raw.frequency as HabitFrequency) : 'daily',
+    statGains: (raw.statGains && typeof raw.statGains === 'object' ? raw.statGains : {}) as StatsMap,
+    streak: typeof raw.streak === 'number' ? raw.streak : 0,
+    longestStreak: typeof raw.longestStreak === 'number' ? raw.longestStreak : 0,
+    completionLog: Array.isArray(raw.completionLog) ? (raw.completionLog as string[]) : [],
+    isActive: typeof raw.isActive === 'boolean' ? raw.isActive : true,
+    createdAt: toDate(raw.createdAt),
+  }
+}
+
+// ─── Habit CRUD ────────────────────────────────────────────────────────────────
+
+export async function getHabits(uid: string): Promise<Habit[]> {
+  const habitsRef = collection(db, 'users', uid, 'habits')
+  const snapshot = await getDocs(habitsRef)
+  return snapshot.docs
+    .map((d) => rawToHabit(d.id, d.data() as Record<string, unknown>))
+    .filter((h) => h.isActive)
+}
+
+export async function createHabit(
+  uid: string,
+  data: CreateHabitInput,
+  currentHabitCount: number
+): Promise<Habit> {
+  if (currentHabitCount >= 5) {
+    throw new Error('HABIT_LIMIT_REACHED')
+  }
+  const habitsRef = collection(db, 'users', uid, 'habits')
+  const payload: Record<string, unknown> = {
+    userId: uid,
+    title: data.title,
+    description: data.description ?? null,
+    domain: data.domain,
+    frequency: data.frequency,
+    statGains: data.statGains,
+    streak: 0,
+    longestStreak: 0,
+    completionLog: [],
+    isActive: true,
+    createdAt: serverTimestamp(),
+  }
+  const docRef = await addDoc(habitsRef, payload)
+  return {
+    id: docRef.id,
+    userId: uid,
+    title: data.title,
+    description: data.description,
+    domain: data.domain,
+    frequency: data.frequency,
+    statGains: data.statGains,
+    streak: 0,
+    longestStreak: 0,
+    completionLog: [],
+    isActive: true,
+    createdAt: new Date(),
+  }
+}
+
+export async function deleteHabit(uid: string, habitId: string): Promise<void> {
+  const habitRef = doc(db, 'users', uid, 'habits', habitId)
+  await deleteDoc(habitRef)
+}
+
+export interface ToggleHabitResult {
+  newStreak: number
+  wasFreezed: boolean
+}
+
+export async function toggleHabitCompletion(
+  uid: string,
+  habitId: string,
+  statGains: StatsMap
+): Promise<ToggleHabitResult> {
+  const userRef = doc(db, 'users', uid)
+  const habitRef = doc(db, 'users', uid, 'habits', habitId)
+
+  return runTransaction(db, async (transaction) => {
+    const [habitSnap, userSnap] = await Promise.all([
+      transaction.get(habitRef),
+      transaction.get(userRef),
+    ])
+
+    if (!habitSnap.exists()) throw new Error('Habit not found')
+    if (!userSnap.exists()) throw new Error('User profile not found')
+
+    const raw = habitSnap.data() as Record<string, unknown>
+    const habit = rawToHabit(habitSnap.id, raw)
+
+    const today = localDateStr()
+    if (habit.completionLog.includes(today)) {
+      throw new Error('ALREADY_COMPLETED_TODAY')
+    }
+
+    const newLog = [...habit.completionLog, today]
+
+    // Streak calculation
+    let newStreak = 1
+    let wasFreezed = false
+    const yesterday = localDateStr(new Date(Date.now() - 86_400_000))
+
+    if (newLog.includes(yesterday)) {
+      newStreak = habit.streak + 1
+    } else {
+      // Streak freeze: check if only 1 miss in last 7 days
+      const recentDays: string[] = []
+      for (let i = 1; i <= 6; i++) {
+        recentDays.push(localDateStr(new Date(Date.now() - i * 86_400_000)))
+      }
+      const missedDays = recentDays.filter((d) => !newLog.includes(d))
+      if (missedDays.length === 1 && habit.streak > 0) {
+        // Streak freeze used — keep streak going
+        newStreak = habit.streak + 1
+        wasFreezed = true
+      } else {
+        newStreak = 1
+      }
+    }
+
+    const newLongestStreak = Math.max(habit.longestStreak, newStreak)
+
+    const userData = userSnap.data()
+    const prevStats: StatsMap = (userData.stats && typeof userData.stats === 'object'
+      ? userData.stats
+      : {}) as StatsMap
+    const newStats = applyStatGains(prevStats, statGains)
+    const newPlayerClass = computePlayerClass(newStats)
+
+    transaction.update(habitRef, {
+      completionLog: newLog,
+      streak: newStreak,
+      longestStreak: newLongestStreak,
+    })
+
+    transaction.update(userRef, {
+      stats: newStats,
+      playerClass: newPlayerClass,
+      lastActiveAt: serverTimestamp(),
+    })
+
+    return { newStreak, wasFreezed }
+  })
 }
